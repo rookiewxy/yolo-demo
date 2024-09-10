@@ -26,7 +26,7 @@ html {
 }
 
 .right {
-  flex: 1
+  flex: 1;
 }
 
 .upload-btn{
@@ -34,8 +34,11 @@ html {
 }
 
 .item{
+  float: left;
+  margin: 0 8px 8px 0;
   border-radius: 4px;
   padding: 4px 10px;
   width: max-content;
+  height: max-content;
   background-color: rgba(255, 255, 255, 0.1);
 }

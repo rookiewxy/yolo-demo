@@ -10,7 +10,10 @@ const hf = new HfInference('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')
 
 function App() {
   const [fileList, setFileList] = useState<UploadFile[]>([])
-  const [label, setLabel] = useState([])
+  const [label, setLabel] = useState<string[]>([])
+  const [countOccurrences, setCountOccurrences] = useState({})
+
+
   const handleChange  = ({ fileList }:{fileList:UploadFile[]}) =>{
     setFileList(fileList);
     handleObjectDetection(fileList[fileList.length-1].originFileObj!)
@@ -21,8 +24,15 @@ function App() {
       data,
       model: 'facebook/detr-resnet-50'
     })
-    setLabel(res[0].label.split(','))
-    console.log(res,res[0].label.split(','))
+    
+    const labels = res.map(d=>d.label)
+    setLabel(labels as string[])
+
+    const countOccurrences = labels.reduce((acc, label) => {
+      acc[label] = (acc[label] || 0) + 1; // 如果当前 label 已存在则加1，否则初始化为1
+      return acc;
+    }, {} as any);
+    setCountOccurrences(countOccurrences)
   }
   return (
     <>
@@ -43,7 +53,11 @@ function App() {
 
         </div>
         <div className="right">
-          {label.map((l,i) => <div className="item" key={i}>{l}</div> )}
+          {
+            Object.keys(countOccurrences).map((key, i) => (
+              <div className="item" key={i}>{`${key}  (+${countOccurrences[key]})`}</div>
+            ))
+          }
         </div>
       </div>
     </>

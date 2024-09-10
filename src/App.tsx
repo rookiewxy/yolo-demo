@@ -1,33 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Upload, UploadFile } from 'antd'
+import { PlusOutlined } from '@ant-design/icons';
 import './App.css'
+import { useState } from 'react';
+
+import { HfInference } from '@huggingface/inference'
+
+const hf = new HfInference('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')
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [fileList, setFileList] = useState<UploadFile[]>([])
+  const [label, setLabel] = useState([])
+  const handleChange  = ({ fileList }:{fileList:UploadFile[]}) =>{
+    setFileList(fileList);
+    handleObjectDetection(fileList[fileList.length-1].originFileObj!)
+  }
 
+  const handleObjectDetection = async (data:Blob)=>{
+    const res = await hf.objectDetection({
+      data,
+      model: 'facebook/detr-resnet-50'
+    })
+    setLabel(res[0].label.split(','))
+    console.log(res,res[0].label.split(','))
+  }
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <p className='title'>AI Image Detector</p>
+      <div className='outerbox'>
+        <div className="left">
+          <Upload
+          action=""
+          listType="picture-card"
+          fileList={fileList}
+          onChange={handleChange}
+        >
+          {fileList.length >= 8 ? null :  <div className='upload-btn'>
+          <PlusOutlined />
+          <div >Upload</div>
+        </div>}
+        </Upload>
+
+        </div>
+        <div className="right">
+          {label.map((l,i) => <div className="item" key={i}>{l}</div> )}
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }

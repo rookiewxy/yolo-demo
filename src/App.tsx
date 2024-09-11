@@ -14,18 +14,18 @@ function App() {
   const [countOccurrences, setCountOccurrences] = useState({})
 
 
-  const handleChange  = ({ fileList }:{fileList:UploadFile[]}) =>{
+  const handleChange = ({ fileList }: { fileList: UploadFile[] }) => {
     setFileList(fileList);
-    handleObjectDetection(fileList[fileList.length-1].originFileObj!)
+    handleObjectDetection(fileList[fileList.length - 1].originFileObj!)
   }
 
-  const handleObjectDetection = async (data:Blob)=>{
-    const res = await hf.objectDetection({
-      data,
-      model: 'facebook/detr-resnet-50'
+  const handleObjectDetection = async (data: Blob) => {
+    const res = await hf.imageClassification({
+      data: 'https://xtspace.cc:8888/1.webp',
+      model: 'hustvl/yolos-tiny'
     })
-    
-    const labels = res.map(d=>d.label)
+    debugger
+    const labels = res.map(d => d.label)
     setLabel(labels as string[])
 
     const countOccurrences = labels.reduce((acc, label) => {
@@ -40,16 +40,16 @@ function App() {
       <div className='outerbox'>
         <div className="left">
           <Upload
-          action=""
-          listType="picture-card"
-          fileList={fileList}
-          onChange={handleChange}
-        >
-          {fileList.length >= 8 ? null :  <div className='upload-btn'>
-          <PlusOutlined />
-          <div >Upload</div>
-        </div>}
-        </Upload>
+            action=""
+            listType="picture-card"
+            fileList={fileList}
+            onChange={handleChange}
+          >
+            {fileList.length >= 8 ? null : <div className='upload-btn'>
+              <PlusOutlined />
+              <div >Upload</div>
+            </div>}
+          </Upload>
 
         </div>
         <div className="right">
